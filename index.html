@@ -1,0 +1,34 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Shoply | Store</title>
+<style>
+*{box-sizing:border-box;margin:0}body{font-family:system-ui,sans-serif;background:#faf7f2;color:#1d1b19}
+header{display:flex;justify-content:space-between;align-items:center;padding:1rem 5%;background:#fff;border-bottom:1px solid #e8e2d9;position:sticky;top:0;z-index:5}
+h1{font-size:1.4rem}button{font:inherit;cursor:pointer}
+.cartbtn{background:#1d1b19;color:#fff;border:0;padding:.6rem 1.1rem;border-radius:99px}
+.bar{display:flex;gap:.6rem;flex-wrap:wrap;padding:1.2rem 5%}
+.bar button{border:1px solid #d9d2c6;background:#fff;padding:.4rem 1rem;border-radius:99px}.bar .on{background:#e4572e;color:#fff;border-color:#e4572e}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:1.2rem;padding:0 5% 3rem}
+.p{background:#fff;border:1px solid #e8e2d9;border-radius:14px;padding:1rem;text-align:center;transition:.2s}.p:hover{transform:translateY(-4px);box-shadow:0 12px 24px -14px #0003}
+.p span{font-size:3.4rem;display:block;background:#f3ede3;border-radius:10px;padding:1rem}.p h3{margin:.7rem 0 .2rem;font-size:1rem}
+.p b{display:block;margin-bottom:.7rem}.p button{width:100%;border:0;background:#e4572e;color:#fff;padding:.55rem;border-radius:8px}
+aside{position:fixed;top:0;right:0;height:100%;width:min(340px,100%);background:#fff;padding:1.2rem;transform:translateX(100%);transition:.3s;box-shadow:-10px 0 30px #0002;z-index:9;display:flex;flex-direction:column}
+aside.open{transform:none}.row{display:flex;justify-content:space-between;align-items:center;padding:.6rem 0;border-bottom:1px solid #eee}
+.row button{width:26px;height:26px;border-radius:50%;border:1px solid #ccc;background:#fff}#items{flex:1;overflow:auto}
+.total{display:flex;justify-content:space-between;font-weight:700;padding:1rem 0}
+</style></head><body>
+<header><h1>Shoply</h1><button class="cartbtn" id="open">Cart (<span id="count">0</span>)</button></header>
+<div class="bar" id="bar"></div><main class="grid" id="grid"></main>
+<aside id="cart"><div class="row"><h2>Your cart</h2><button id="close">✕</button></div><div id="items"></div>
+<div class="total"><span>Total</span><span id="total">$0</span></div><button class="cartbtn" id="pay">Checkout</button></aside>
+<script>
+const P=[["🎧","Headphones",59,"Tech"],["⌚","Smart Watch",129,"Tech"],["📷","Camera",349,"Tech"],["👟","Sneakers",89,"Fashion"],["🧥","Jacket",110,"Fashion"],["🕶️","Sunglasses",45,"Fashion"],["☕","Coffee Maker",75,"Home"],["🪴","Plant Pot",18,"Home"],["💡","Desk Lamp",32,"Home"]].map((p,i)=>({id:i,e:p[0],n:p[1],price:p[2],c:p[3]}));
+let cart=JSON.parse(localStorage.getItem("cart")||"{}"),cat="All";const $=s=>document.querySelector(s);
+function shop(){$("#bar").innerHTML=["All","Tech","Fashion","Home"].map(c=>`<button class="${c==cat?"on":""}" onclick="cat='${c}';shop()">${c}</button>`).join("");
+$("#grid").innerHTML=P.filter(p=>cat=="All"||p.c==cat).map(p=>`<article class="p"><span>${p.e}</span><h3>${p.n}</h3><b>$${p.price}</b><button onclick="add(${p.id},1)">Add to cart</button></article>`).join("")}
+function add(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];localStorage.setItem("cart",JSON.stringify(cart));draw()}
+function draw(){const ids=Object.keys(cart);$("#count").textContent=ids.reduce((a,i)=>a+cart[i],0);
+$("#items").innerHTML=ids.length?ids.map(i=>`<div class="row"><span>${P[i].e} ${P[i].n}</span><span><button onclick="add(${i},-1)">−</button> ${cart[i]} <button onclick="add(${i},1)">+</button></span></div>`).join(""):"<p style='padding:1rem 0;color:#777'>Your cart is empty. Add something you like.</p>";
+$("#total").textContent="$"+ids.reduce((a,i)=>a+cart[i]*P[i].price,0)}
+$("#open").onclick=()=>$("#cart").classList.add("open");$("#close").onclick=()=>$("#cart").classList.remove("open");
+$("#pay").onclick=()=>{if(Object.keys(cart).length){alert("Order placed (demo). Thank you!");cart={};add(0,0)}};
+shop();draw();
+</script></body></html>
